@@ -38,7 +38,7 @@ public class BarberService {
         Optional<BarberSchedule> scheduleOpt = barberScheduleRepository.findById(reservationRequest.getScheduleId());
 
         if (!scheduleOpt.isPresent()) {
-            throw new ScheduleNotFoundException("Schedule not found");
+            throw new ScheduleNotFoundException();
         }
 
         BarberSchedule schedule = scheduleOpt.get();
@@ -56,7 +56,7 @@ public class BarberService {
         schedule.setReserved(true);
 
         // Ruaj rezervimin dhe përditëso orarin në databazë
-        reservationRepository.save(reservation);
+       // reservationRepository.save(reservation);
         barberScheduleRepository.save(schedule);
 
         return true;

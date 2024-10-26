@@ -16,6 +16,8 @@ public class BarberSchedule {
     private String timeSlot;
     private boolean available;
 
+    private boolean reserved;
+
     public Long getId() {
         return id;
     }
@@ -50,6 +52,14 @@ public class BarberSchedule {
 
     public boolean isAvailable() {
         return available;
+    }
+
+    public boolean isReserved() {
+        return reserved;
+    }
+
+    public void setReserved(boolean reserved) {
+        this.reserved = reserved;
     }
 
     public void setAvailable(boolean available) {

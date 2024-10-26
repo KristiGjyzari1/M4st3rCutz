@@ -19,12 +19,12 @@ public class BarberController {
     @Autowired
     private BarberService barberService;
 
-    @PostMapping
+    @PostMapping("/addBarber")
     public Barber addBarber(@RequestBody Barber barber) {
         return barberService.addBarber(barber);
     }
 
-    @GetMapping
+    @GetMapping("/getAllBarbers")
     public List<Barber> getAllBarbers() {
         return barberService.getAllBarbers();
     }
