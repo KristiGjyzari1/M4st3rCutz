@@ -10,7 +10,10 @@ import com.mastercutz.mastercutz_backend.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -55,6 +58,33 @@ public class AppointmentService {
     }
     public List<Appointment> getAppointments() {
         return appointmentRepository.findAll();
+    }
+
+    public List<LocalDateTime> getAvailableAppointments(Long barberId) {
+        // Merrni të gjitha rezervimet për berberin e dhënë
+        List<Appointment> appointments = appointmentRepository.findByBarberId(barberId);
+
+        // Definoni oraret e mundshme (p.sh., çdo 30 minuta nga ora 9:00 deri në 17:00)
+        List<LocalDateTime> availableSlots = new ArrayList<>();
+        LocalDateTime start = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0)); // Ora filluese
+        LocalDateTime end = LocalDateTime.of(LocalDate.now(), LocalTime.of(17, 0)); // Ora përfundimtare
+
+        for (LocalDateTime slot = start; slot.isBefore(end); slot = slot.plusMinutes(30)) {
+            availableSlots.add(slot);
+        }
+
+        // Hiqni oraret e rezervuara nga lista e orareve të mundshme
+        for (Appointment appointment : appointments) {
+            LocalDateTime appointmentTime = appointment.getDateTime();
+            availableSlots.removeIf(slot -> slot.isEqual(appointmentTime));
+        }
+
+        return availableSlots;
+    }
+    public void cancelAppointment(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+        appointmentRepository.delete(appointment);
     }
 
 }

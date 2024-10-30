@@ -32,4 +32,16 @@ public class AppointmentController {
     public List<Appointment> getAppointments() {
         return appointmentService.getAppointments();
     }
+
+    @GetMapping("/availableAppointments/{barberId}")
+    public ResponseEntity<List<LocalDateTime>> getAvailableAppointments(@PathVariable Long barberId) {
+        List<LocalDateTime> availableAppointments = appointmentService.getAvailableAppointments(barberId);
+        return ResponseEntity.ok(availableAppointments);
+    }
+
+    @DeleteMapping("/cancelAppointment/{appointmentId}")
+    public ResponseEntity<Void> cancelAppointment(@PathVariable Long appointmentId) {
+        appointmentService.cancelAppointment(appointmentId);
+        return ResponseEntity.noContent().build();
+    }
 }
