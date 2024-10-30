@@ -15,6 +15,8 @@ public class Client {
 
     private String name;
     private String email;
+
+    private Long phoneNumber;
     private String password;
 
     // Constructors
@@ -57,5 +59,12 @@ public class Client {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+    public Long getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(Long phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

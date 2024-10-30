@@ -1,6 +1,7 @@
 package com.mastercutz.mastercutz_backend.services;
 
 
+import com.mastercutz.mastercutz_backend.dto.UserProfileUpdateDto;
 import com.mastercutz.mastercutz_backend.exception.EmailIsAlradyInUseException;
 import com.mastercutz.mastercutz_backend.exception.ScheduleNotFoundException;
 import com.mastercutz.mastercutz_backend.exception.WrongUsernameOrPassword;
@@ -40,5 +41,17 @@ public class ClientService {
 
     public List<Client> getAllClients() {
         return clientRepository.findAll();
+    }
+
+    public Client updateUserProfile(Long userId, UserProfileUpdateDto updateDto) {
+        Client user = clientRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        user.setName(updateDto.getName());
+        user.setEmail(updateDto.getEmail());
+        user.setPhoneNumber(updateDto.getPhoneNumber());
+        user.setPassword(updateDto.getPassword());
+
+        return clientRepository.save(user);
     }
 }

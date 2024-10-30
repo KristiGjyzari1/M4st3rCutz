@@ -87,6 +87,9 @@ public class AppointmentService {
         appointmentRepository.delete(appointment);
     }
 
+    public List<Appointment> getAppointmentHistory(Long clientId) {
+        return appointmentRepository.findByClientId(clientId);
+    }
 }
 
 

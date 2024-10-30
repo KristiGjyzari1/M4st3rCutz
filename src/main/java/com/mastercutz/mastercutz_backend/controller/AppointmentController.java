@@ -44,4 +44,9 @@ public class AppointmentController {
         appointmentService.cancelAppointment(appointmentId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/history/{clientId}")
+    public List<Appointment> getAppointmentHistory(@PathVariable Long clientId) {
+        return appointmentService.getAppointmentHistory(clientId);
+    }
 }
