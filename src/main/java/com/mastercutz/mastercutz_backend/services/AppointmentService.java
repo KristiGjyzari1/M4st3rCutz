@@ -1,11 +1,12 @@
 package com.mastercutz.mastercutz_backend.services;
 
-import com.mastercutz.mastercutz_backend.exception.EmailIsAlradyInUseException;
 import com.mastercutz.mastercutz_backend.exception.TimeSlotIsNotAvaible;
 import com.mastercutz.mastercutz_backend.model.Appointment;
 import com.mastercutz.mastercutz_backend.model.Barber;
 import com.mastercutz.mastercutz_backend.model.Client;
 import com.mastercutz.mastercutz_backend.repository.AppointmentRepository;
+import com.mastercutz.mastercutz_backend.repository.BarberRepository;
+import com.mastercutz.mastercutz_backend.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,33 +18,40 @@ public class AppointmentService {
 
     @Autowired
     private AppointmentRepository appointmentRepository;
+    @Autowired
+    private BarberRepository barberRepository;
+    @Autowired
+    private ClientRepository clientRepository;
 
-////    public Appointment bookAppointment(Appointment appointment) {
-////        // Kontrollo nëse orari është i lirë, etj.
-////        return appointmentRepository.save(appointment);
-////    }
-//
-//    public Appointment bookAppointment(Appointment appointment) throws TimeSlotIsNotAvaible {
-//        // Kontrollo nëse orari është i lirë, etj.
-//        if (appointmentRepository.findByDateTime(appointment.getDateTime()) == null) {
-//            return appointmentRepository.save(appointment);
-//        }else
-//            throw new TimeSlotIsNotAvaible("Time Slot Is Not Avaible"); // ose hedh një përjashtim (exception) për email të përdorur
-//    }
-
-
-    public Appointment reserveAppointment(Barber barber, LocalDateTime dateTime, Client client) {
-        // Kontrollo nëse ekziston një rezervim për këtë berber në këtë orar
-        if (appointmentRepository.existsByBarberIdAndDateTime(barber, dateTime)) {
-            throw new IllegalStateException("This time slot is already taken.");
+    public Appointment registerAppointment(Appointment appointment, Long barberId, Long clientId, LocalDateTime localDateTime) throws TimeSlotIsNotAvaible {
+        // Kontrolloni nëse ID-të nuk janë null
+        if (barberId == null || clientId == null) {
+            throw new IllegalArgumentException("Barber ID and Client ID must not be null");
         }
-        // Krijo një objekt të ri për rezervimin
-        Appointment appointment = new Appointment();
+
+        // Merrni Barber nga baza e të dhënave
+        Barber barber = barberRepository.findById(barberId)
+                .orElseThrow(() -> new IllegalArgumentException("Barber not found"));
+
+        // Merrni Client nga baza e të dhënave
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new IllegalArgumentException("Client not found"));
+
+        // Kontrolloni nëse ekziston një rezervim për këtë berber në këtë orar
+        if (appointmentRepository.existsByBarberIdAndDateTime(barber.getId(), localDateTime)) {
+            throw new TimeSlotIsNotAvaible("Appointment Is Already In Use");
+        }
+
+        // Lidheni barberin dhe klientin me objektin e rezervimit
         appointment.setBarber(barber);
-        appointment.setDateTime(dateTime);
         appointment.setClient(client);
-        // Ruaj rezervimin në bazën e të dhënave
-        return appointmentRepository.save(appointment);
+        appointment.setDateTime(localDateTime);
+
+        // Ruani rezervimin
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+        System.out.println("Appointment saved with ID: " + savedAppointment.getId());
+
+        return savedAppointment;
     }
     public List<Appointment> getAppointments() {
         return appointmentRepository.findAll();

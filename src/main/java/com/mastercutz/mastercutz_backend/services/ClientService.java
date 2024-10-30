@@ -18,11 +18,16 @@ public class ClientService {
     private ClientRepository clientRepository;
 
     public Client registerClient(Client client) throws EmailIsAlradyInUseException {
+        System.out.println("Registering client with email: " + client.getEmail());
+
         // Kontrollo nëse email-i është unikal
         if (clientRepository.findByEmail(client.getEmail()) == null) {
-            return clientRepository.save(client);
-        }else
-        throw new EmailIsAlradyInUseException("Email Is Alrady In Use Exception"); // ose hedh një përjashtim (exception) për email të përdorur
+            Client savedClient = clientRepository.save(client);
+            System.out.println("Client saved with ID: " + savedClient.getId());
+            return savedClient;
+        } else {
+            throw new EmailIsAlradyInUseException("Email Is Already In Use");
+        }
     }
 
     public Client loginClient(String email, String password) throws WrongUsernameOrPassword {

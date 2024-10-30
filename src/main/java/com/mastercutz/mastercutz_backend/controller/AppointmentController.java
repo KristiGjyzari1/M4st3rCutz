@@ -6,6 +6,7 @@ import com.mastercutz.mastercutz_backend.model.Barber;
 import com.mastercutz.mastercutz_backend.model.Client;
 import com.mastercutz.mastercutz_backend.services.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -19,8 +20,12 @@ public class AppointmentController {
     private AppointmentService appointmentService;
 
     @PostMapping("/bookAppointment")
-    public Appointment bookAppointment(@RequestBody  Barber barber, LocalDateTime dateTime, Client client) throws TimeSlotIsNotAvaible {
-        return appointmentService.reserveAppointment(barber,dateTime,client);
+    public Appointment bookAppointment(@RequestBody Appointment appointment) throws Throwable {
+        Long barberId = appointment.getBarber().getId();
+        Long clientId = appointment.getClient().getId();
+        LocalDateTime localDateTime = appointment.getDateTime();
+
+        return appointmentService.registerAppointment(appointment, barberId, clientId, localDateTime);
     }
 
     @GetMapping("/getAllAppointments")

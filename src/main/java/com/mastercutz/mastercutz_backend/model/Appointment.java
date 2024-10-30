@@ -11,13 +11,16 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     private Client client;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     private Barber barber;
 
     private LocalDateTime dateTime;
+
+   // private LocalDateTime timestamp; // Shto këtë fushë
+
 
     // Constructors
     public Appointment() {}
@@ -60,4 +63,13 @@ public class Appointment {
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
     }
+
+    // Getter dhe Setter për timestamp
+//    public LocalDateTime getTimestamp() {
+//        return timestamp;
+//    }
+//
+//    public void setTimestamp(LocalDateTime timestamp) {
+//        this.timestamp = timestamp;
+//    }
 }
