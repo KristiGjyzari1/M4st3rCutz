@@ -8,6 +8,7 @@ import com.mastercutz.mastercutz_backend.repository.AppointmentRepository;
 import com.mastercutz.mastercutz_backend.repository.BarberRepository;
 import com.mastercutz.mastercutz_backend.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,6 +26,8 @@ public class AppointmentService {
     private BarberRepository barberRepository;
     @Autowired
     private ClientRepository clientRepository;
+    @Autowired
+    private EmailService emailService;
 
     public Appointment registerAppointment(Appointment appointment, Long barberId, Long clientId, LocalDateTime localDateTime) throws TimeSlotIsNotAvaible {
         // Kontrolloni nëse ID-të nuk janë null
@@ -54,8 +57,11 @@ public class AppointmentService {
         Appointment savedAppointment = appointmentRepository.save(appointment);
         System.out.println("Appointment saved with ID: " + savedAppointment.getId());
 
+        // Dërgoni emailin e konfirmimit
+        emailService.sendConfirmationEmail(client.getEmail(), savedAppointment);
         return savedAppointment;
     }
+
     public List<Appointment> getAppointments() {
         return appointmentRepository.findAll();
     }
@@ -81,6 +87,7 @@ public class AppointmentService {
 
         return availableSlots;
     }
+
     public void cancelAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
@@ -89,6 +96,14 @@ public class AppointmentService {
 
     public List<Appointment> getAppointmentHistory(Long clientId) {
         return appointmentRepository.findByClientId(clientId);
+    }
+
+    @Scheduled(cron = "0 0 9 * * ?") // Çdo ditë në orën 9:00
+    public void sendReminders() {
+        List<Appointment> upcomingAppointments = appointmentRepository.findUpcomingAppointments();
+        for (Appointment appointment : upcomingAppointments) {
+            emailService.sendReminderEmail(appointment.getClient().getEmail(), appointment);
+        }
     }
 }
 
